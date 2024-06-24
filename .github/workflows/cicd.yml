@@ -38,17 +38,17 @@ jobs:
 
       - name: Update Helm chart
         run: |
-          sed -i 's|image: .*|image: yourusername/yourimage:latest|' ./charts/mychart/values.yaml
-          cat ./charts/mychart/values.yaml
+          sed -i 's|image: .*|image: nolabelregistry/devops:latest|' ./helm/values.yaml
+          cat ./helm/values.yaml
 
       - name: Package Helm chart
-        run: helm package ./charts/mychart
+        run: helm package ./helm
 
       - name: Upload Helm chart
         uses: actions/upload-artifact@v2
         with:
-          name: mychart
-          path: mychart-*.tgz
+          name: init-chart
+          path: init-chart-*.tgz
 
   deploy-to-server:
     needs: update-helm-chart
