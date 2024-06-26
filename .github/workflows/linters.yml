@@ -8,6 +8,7 @@ on:
 
 jobs:
   codeql-analysis:
+    permissions: write-all
     name: Perform CodeQL Analysis
     runs-on: ubuntu-latest
 
@@ -22,7 +23,7 @@ jobs:
       uses: github/codeql-action/autobuild@v2
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      uses: github/codeql-action/analyze@v2
 
   sonarcloud-analysis:
     name: Perform SonarCloud Analysis
