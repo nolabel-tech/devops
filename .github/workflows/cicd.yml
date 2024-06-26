@@ -47,32 +47,36 @@ jobs:
       - name: Upload Helm chart
         uses: actions/upload-artifact@v2
         with:
-          name: init-chart
-          path: init-chart-*.tgz
+          name: devops
+          path: devops-*.tgz
 
-  deploy-to-server:
-    needs: update-helm-chart
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Helm chart
-        uses: actions/download-artifact@v2
-        with:
-          name: mychart
+  jobs:
+    deploy-to-server:
+      needs: update-helm-chart
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
 
-      - name: Copy Helm chart to server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "mychart-*.tgz"
-          target: "/tmp"
+        - name: Download Helm chart
+          uses: actions/download-artifact@v2
+          with:
+            name: devops
 
-      - name: Deploy Helm chart
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            helm upgrade --install myrelease /tmp/mychart-*.tgz
+        - name: Copy Helm chart to server
+          uses: appleboy/scp-action@master
+          with:
+            host: ${{ secrets.SERVER_IP }}
+            username: ${{ secrets.SERVER_USER }}
+            key: ${{ secrets.SERVER_SSH_KEY }}
+            source: "devops-*.tgz"
+            target: "/tmp"
+
+        - name: Deploy Helm chart
+          uses: appleboy/ssh-action@master
+          with:
+            host: ${{ secrets.SERVER_IP }}
+            username: ${{ secrets.SERVER_USER }}
+            key: ${{ secrets.SERVER_SSH_KEY }}
+            script: |
+              helm upgrade --install test-release /tmp/devops-*.tgz --namespace test-ns --create-namespace
